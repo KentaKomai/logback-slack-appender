@@ -16,6 +16,10 @@ public class SlackAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
 
     private String token;
 
+    private String userName;
+
+    private String iconEmoji;
+
     private String channel;
 
     private Layout layout;
@@ -29,6 +33,12 @@ public class SlackAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
             w.append("token=").append(token).append("&");
             if(channel != null) {
                 w.append("channel=").append(URLEncoder.encode(channel, "UTF-8")).append("&");
+            }
+            if(iconEmoji != null) {
+                w.append("icon_emoji=").append(URLEncoder.encode(iconEmoji, "UTF-8")).append("&");
+            }
+            if(userName != null) {
+                w.append("username=").append(URLEncoder.encode(userName, "UTF-8")).append("&");
             }
             if(layout != null) {
                 w.append("text=").append(URLEncoder.encode(layout.doLayout(evt), "UTF-8"));
@@ -62,6 +72,21 @@ public class SlackAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
 
     public void setToken(final String token) {
         this.token = token;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(final String userName) {
+        this.userName = userName;
+    }
+
+    public String getIconEmoji() {
+        return iconEmoji;
+    }
+    public void setIconEmoji(final String iconEmoji) {
+        this.iconEmoji = iconEmoji;
     }
 
     public String getChannel() {
