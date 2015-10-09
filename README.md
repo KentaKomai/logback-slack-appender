@@ -15,6 +15,10 @@ Add SlackAppender configuration to logback.xml file
 			<token>1111111111-1111111-11111111-111111111</token>
 			<!-- Channel that you want to post - default is #general -->
 			<channel>#api-test</channel>
+			<!-- Bot's username - default is 'bot' -->
+			<username>Error Notification!</channel>
+			<!-- Bot's icon -->
+			<iconEmoji>:persevere:</channel>
 			<!-- Formatting -->
 			<layout class="ch.qos.logback.classic.PatternLayout">
 				<pattern>%-4relative [%thread] %-5level %class - %msg%n</pattern>
