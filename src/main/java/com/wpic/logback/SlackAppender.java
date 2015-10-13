@@ -1,14 +1,17 @@
 package com.wpic.logback;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.StringWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.concurrent.CompletableFuture;
+
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Layout;
 import ch.qos.logback.core.LayoutBase;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
-
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
 
 public class SlackAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
 
@@ -31,16 +34,16 @@ public class SlackAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
 
             final StringWriter w = new StringWriter();
             w.append("token=").append(token).append("&");
-            if(channel != null) {
+            if (channel != null) {
                 w.append("channel=").append(URLEncoder.encode(channel, "UTF-8")).append("&");
             }
-            if(iconEmoji != null) {
+            if (iconEmoji != null) {
                 w.append("icon_emoji=").append(URLEncoder.encode(iconEmoji, "UTF-8")).append("&");
             }
-            if(userName != null) {
+            if (userName != null) {
                 w.append("username=").append(URLEncoder.encode(userName, "UTF-8")).append("&");
             }
-            if(layout != null) {
+            if (layout != null) {
                 w.append("text=").append(URLEncoder.encode(layout.doLayout(evt), "UTF-8"));
             } else {
                 w.append("text=").append(URLEncoder.encode(defaultLayout.doLayout(evt), "UTF-8"));
@@ -48,18 +51,30 @@ public class SlackAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
 
             final byte[] bytes = w.toString().getBytes("UTF-8");
 
-            final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setDoOutput(true);
-            conn.setRequestMethod("POST");
-            conn.setFixedLengthStreamingMode(bytes.length);
-            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            CompletableFuture.runAsync(() -> {
+                HttpURLConnection conn = null;
+                try {
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setDoOutput(true);
+                    conn.setRequestMethod("POST");
+                    conn.setFixedLengthStreamingMode(bytes.length);
+                    conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 
-            final OutputStream os = conn.getOutputStream();
-            os.write(bytes);
+                    try (OutputStream os = conn.getOutputStream()) {
+                        os.write(bytes);
+                        os.flush();
+                    }
 
-            os.flush();
-            os.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    addError("Error to post log to Slack.com (" + channel + "): " + evt, e);
 
+                } finally {
+                    if (conn != null) {
+                        conn.disconnect();
+                    }
+                }
+            });
         } catch (Exception ex) {
             ex.printStackTrace();
             addError("Error to post log to Slack.com (" + channel + "): " + evt, ex);
@@ -85,6 +100,7 @@ public class SlackAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
     public String getIconEmoji() {
         return iconEmoji;
     }
+
     public void setIconEmoji(final String iconEmoji) {
         this.iconEmoji = iconEmoji;
     }
@@ -121,5 +137,4 @@ public class SlackAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
         }
 
     };
-
 }
