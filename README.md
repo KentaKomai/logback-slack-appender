@@ -6,30 +6,32 @@ Copy **com.wpic.logback.SlackAppender.java** to your source directory
 
 Add SlackAppender configuration to logback.xml file
 
-	<?xml version="1.0" encoding="UTF-8" ?>
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
 	<configuration>
+	
+	<!-- Setup appender -->
+	<appender name="SLACK" class="com.wpic.logback.SlackAppender">
+		<!-- API token - Get it from here: https://api.slack.com/ -->
+		<token>1111111111-1111111-11111111-111111111</token>
+		<!-- Channel that you want to post - default is #general -->
+		<channel>#api-test</channel>
+		<!-- Bot's username - default is 'bot' -->
+		<username>Error Notification!</username>
+		<!-- Bot's icon that does not contain a colon(:)-->
+		<iconEmoji>persevere</iconEmoji>
+		<!-- Formatting -->
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>%-4relative [%thread] %-5level %class - %msg%n</pattern>
+		</layout>
+	</appender>
 
-		<!-- Setup appender -->
-		<appender name="SLACK" class="com.wpic.logback.SlackAppender">
-			<!-- API token - Get it from here: https://api.slack.com/ -->
-			<token>1111111111-1111111-11111111-111111111</token>
-			<!-- Channel that you want to post - default is #general -->
-			<channel>#api-test</channel>
-			<!-- Bot's username - default is 'bot' -->
-			<username>Error Notification!</username>
-			<!-- Bot's icon that does not contain a colon(:)-->
-			<iconEmoji>persevere</iconEmoji>
-			<!-- Formatting -->
-			<layout class="ch.qos.logback.classic.PatternLayout">
-				<pattern>%-4relative [%thread] %-5level %class - %msg%n</pattern>
-			</layout>
-		</appender>
+	<root>
+		<level value="ALL" />
+		<appender-ref ref="SLACK" />
+	</root>
 
-		<root>
-			<level value="ALL" />
-			<appender-ref ref="SLACK" />
-		</root>
-
-	</configuration>
+</configuration>
+```
 
 Done!
