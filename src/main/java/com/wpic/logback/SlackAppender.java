@@ -38,7 +38,7 @@ public class SlackAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
                 w.append("channel=").append(URLEncoder.encode(channel, "UTF-8")).append("&");
             }
             if (iconEmoji != null) {
-                w.append("icon_emoji=").append(URLEncoder.encode(iconEmoji, "UTF-8")).append("&");
+                w.append("icon_emoji=").append(URLEncoder.encode(String.format(":%s:", iconEmoji), "UTF-8")).append("&");
             }
             if (userName != null) {
                 w.append("username=").append(URLEncoder.encode(userName, "UTF-8")).append("&");
